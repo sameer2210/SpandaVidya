@@ -6,7 +6,7 @@ import Input from './components/Input';
 import Sidebar from './components/Sidebar';
 import { ICONS } from './constants';
 import { api } from './services/api';
-import { GeminiService } from './services/geminiService';
+import { ChatService } from './services/chatService';
 import { AuthState, ChatState, Conversation, Message, Role } from './types';
 
 const App: React.FC = () => {
@@ -28,13 +28,21 @@ const App: React.FC = () => {
   });
 
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-  const [gemini, setGemini] = useState<GeminiService | null>(null);
+  const [chatService, setChatService] = useState<ChatService | null>(null);
 
   // --- Persistence Effects ---
   useEffect(() => {
     localStorage.setItem('nebula_auth', JSON.stringify(auth));
-    if (auth.isAuthenticated) {
-      setGemini(new GeminiService(auth.user?.name || 'User'));
+    if (auth.isAuthenticated && auth.user) {
+      setChatService(prev => {
+        prev?.disconnect();
+        return new ChatService(auth.user.id, auth.user.name || 'User');
+      });
+    } else {
+      setChatService(prev => {
+        prev?.disconnect();
+        return null;
+      });
     }
   }, [auth]);
 
@@ -96,6 +104,7 @@ const App: React.FC = () => {
   };
 
   const handleLogout = () => {
+    chatService?.disconnect();
     setAuth({ user: null, isAuthenticated: false });
     setChatState({ ...chatState, activeConversationId: null });
   };
@@ -134,7 +143,7 @@ const App: React.FC = () => {
   };
 
   const handleSendMessage = async (text: string) => {
-    if (!gemini || !chatState.activeConversationId) return;
+    if (!chatService || !chatState.activeConversationId) return;
     if (!auth.user) return;
 
     const currentChatId = chatState.activeConversationId;
@@ -188,7 +197,7 @@ const App: React.FC = () => {
       const effectiveHistory = [...history, userMsg];
 
       // 4. Stream Response
-      const stream = await gemini.streamChat(effectiveHistory, text);
+      const stream = await chatService.streamChat(effectiveHistory, text, currentChatId);
 
       let accumulatedText = '';
 

@@ -47,7 +47,7 @@ app.set('trust proxy', 1);
 
 app.get('/', (req, res) => {
   res.json({
-    message: 'CodeX API Server is running',
+    message: 'API Server is running',
     status: 'healthy',
     timestamp: new Date().toISOString(),
     version: '1.0.0',
