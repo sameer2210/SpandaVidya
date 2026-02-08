@@ -25,7 +25,7 @@ const _config = {
   MONGODB_URI: process.env.MONGODB_URI || 'mongodb://localhost:27017/codex',
   JWT_SECRET: process.env.JWT_SECRET || 'your-secret-key',
   GOOGLE_API_KEY: process.env.GOOGLE_API_KEY,
-  GEMINI_MODEL: process.env.GEMINI_MODEL || 'gemini-1.5-flash',
+  GEMINI_MODEL: process.env.GEMINI_MODEL || 'model: "gemini-1.5-flash-latest',
 };
 
 export default Object.freeze(_config);

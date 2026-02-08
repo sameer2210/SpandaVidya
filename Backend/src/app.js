@@ -6,11 +6,12 @@ import config from './config/config.js';
 
 import messageRoutes from './routes/message.routes.js';
 import userRoutes from './routes/user.routes.js';
+import healthRoutes from './routes/health.routes.js';
 
 const app = express();
 app.use(helmet());
 
-// const allowedOrigins = ['http://localhost:5173', 'https://codex-psi-murex.vercel.app/];
+// const allowedOrigins = ['http://localhost:5173', ];
 const normalizeOrigin = origin => (origin ? origin.replace(/\/+$/, '') : origin);
 const allowedOrigins = config.FRONTEND_URLS.map(normalizeOrigin);
 
@@ -56,5 +57,6 @@ app.get('/', (req, res) => {
 
 app.use('/api/users', userRoutes);
 app.use('/api/messages', messageRoutes);
+app.use('/api/health', healthRoutes);
 
 export default app;
